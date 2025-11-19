@@ -19,11 +19,11 @@ public class UserModel {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "avatar_image")
-    private byte[] avatarImage;
+    @Column
+    private byte[] avatar;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_role", nullable = false)
+    @Column(nullable = false)
     private Role userRole;
 
 }

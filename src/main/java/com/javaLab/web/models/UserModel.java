@@ -1,7 +1,15 @@
 package com.javaLab.web.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class UserModel {
@@ -20,11 +28,11 @@ public class UserModel {
     private String email;
 
     @Column
-    private byte[] avatar;
+    private String avatar;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role userRole;
+    private Role Role;
 
 }
 

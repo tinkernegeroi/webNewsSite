@@ -1,4 +1,4 @@
-package com.javaLab.web.schemas;
+package com.javaLab.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,9 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginSchema {
+public class UserCreateDTO {
 
     private String username;
 
     private String password;
+
+    private String email;
+
+    private MultipartFile avatar;
 }

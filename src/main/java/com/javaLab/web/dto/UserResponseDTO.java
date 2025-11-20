@@ -1,4 +1,4 @@
-package com.javaLab.web.schemas;
+package com.javaLab.web.dto;
 
 import com.javaLab.web.models.Role;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponseSchema implements Serializable {
+public class UserResponseDTO implements Serializable {
 
     private Long id;
 

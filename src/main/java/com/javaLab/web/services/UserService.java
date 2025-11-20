@@ -1,49 +1,59 @@
 package com.javaLab.web.services;
 
-import com.javaLab.web.Mapper;
-import com.javaLab.web.schemas.UserCreateSchema;
-import com.javaLab.web.models.UserModel;
+import com.javaLab.web.dto.UserResponseDTO;
+import com.javaLab.web.exceptions.UnauthorizedException;
+import com.javaLab.web.exceptions.UserNotFoundException;
+import com.javaLab.web.models.User;
 import com.javaLab.web.repository.UserRepository;
+import com.javaLab.web.utils.Mapper;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Optional;
-
 
 @Service
 @AllArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private static final String SESSION_USERNAME = "username";
 
-    public ResponseEntity<?> registerUser(UserCreateSchema userCreateSchema) {
-        Optional<String> error = checkIfUserExists(userCreateSchema);
-        if (error.isPresent()) {
-            return new ResponseEntity<>(error.get(), HttpStatus.CONFLICT);
+    private String getUsernameFromSession(HttpSession session) {
+        String username = (String) session.getAttribute(SESSION_USERNAME);
+        if (username == null) {
+            throw new UnauthorizedException("User not logged in");
         }
-        error = validateUserInput(userCreateSchema);
-        if (error.isPresent()) {
-            return new ResponseEntity<>(error.get(), HttpStatus.BAD_REQUEST);
-        }
-        UserModel savedUser = userRepository.save(Mapper.userCreateSchemaToUser(userCreateSchema));
-        return ResponseEntity.ok(Mapper.userToUserResponseSchema(savedUser));
+        return username;
     }
 
-    public ResponseEntity<?> loginUser(UserLoginSchema userLoginSchema){
-        
+    public ResponseEntity<UserResponseDTO> getProfile(HttpSession session) {
+        String username = getUsernameFromSession(session);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return ResponseEntity.ok(Mapper.userToUserResponseDTO(user));
     }
 
-    private Optional<String> checkIfUserExists(UserCreateSchema userCreateSchema) {
-        if (userRepository.findByUsername(userCreateSchema.getUsername()).isPresent()) {
-            return Optional.of("Пользователь с таким логином уже зарегистрирован");
-        }
-        if (userRepository.findByEmail(userCreateSchema.getEmail()).isPresent()) {
-            return Optional.of("Пользователь с такой почтой уже зарегистрирован");
-        }
-        return Optional.empty();
+    public ResponseEntity<String> uploadAvatar(HttpSession session, MultipartFile file) {
+        String username = getUsernameFromSession(session);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        String avatarUrl = Mapper.processAvatar(file, username);
+        user.setAvatar(avatarUrl);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Avatar uploaded");
+    }
+
+    public ResponseEntity<String> deleteAvatar(HttpSession session) {
+        String username = getUsernameFromSession(session);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        user.setAvatar(Mapper.DEFAULT_IMAGE_URL);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Avatar deleted");
     }
 }

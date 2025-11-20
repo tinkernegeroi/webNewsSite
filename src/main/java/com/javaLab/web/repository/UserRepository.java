@@ -1,14 +1,14 @@
 package com.javaLab.web.repository;
 
-import com.javaLab.web.models.UserModel;
+import com.javaLab.web.models.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<UserModel, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<UserModel> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-    Optional<UserModel> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 }

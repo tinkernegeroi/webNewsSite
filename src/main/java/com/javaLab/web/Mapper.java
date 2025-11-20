@@ -1,7 +1,7 @@
 package com.javaLab.web;
 
-import com.javaLab.web.dto.UserCreateDTO;
-import com.javaLab.web.dto.UserResponseDTO;
+import com.javaLab.web.schemas.UserCreateSchema;
+import com.javaLab.web.schemas.UserResponseSchema;
 import com.javaLab.web.models.Role;
 import com.javaLab.web.models.UserModel;
 import com.javaLab.web.exceptions.FileUploadException;
@@ -20,13 +20,13 @@ public class Mapper {
 
     private final static String DEFAULT_IMAGE_URL = "http://localhost:8080/images/DEFAULT.png";
 
-    public static UserModel userCreateDtoToUser (UserCreateDTO userCreateDTO){
+    public static UserModel userCreateSchemaToUser(UserCreateSchema userCreateSchema){
         UserModel user = new UserModel();
-        user.setUsername(userCreateDTO.getUsername());
-        user.setPassword(userCreateDTO.getPassword());
-        user.setEmail(userCreateDTO.getEmail());
+        user.setUsername(userCreateSchema.getUsername());
+        user.setPassword(userCreateSchema.getPassword());
+        user.setEmail(userCreateSchema.getEmail());
         user.setRole(DEFAULT_ROLE);
-        user.setAvatar(processAvatar(userCreateDTO.getAvatar(), userCreateDTO.getUsername()));
+        user.setAvatar(processAvatar(userCreateSchema.getAvatar(), userCreateSchema.getUsername()));
         return user;
     }
 
@@ -45,8 +45,8 @@ public class Mapper {
         }
     }
 
-    public static UserResponseDTO userToUserResponseDto (UserModel user){
-        return new UserResponseDTO(
+    public static UserResponseSchema userToUserResponseSchema(UserModel user){
+        return new UserResponseSchema(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),

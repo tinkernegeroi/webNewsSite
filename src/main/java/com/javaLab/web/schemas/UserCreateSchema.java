@@ -1,4 +1,4 @@
-package com.javaLab.web.dto;
+package com.javaLab.web.schemas;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCreateDTO {
+public class UserCreateSchema {
 
     private String username;
 

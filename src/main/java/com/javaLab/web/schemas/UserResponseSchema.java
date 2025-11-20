@@ -1,5 +1,6 @@
-package com.javaLab.web.dto;
+package com.javaLab.web.schemas;
 
+import com.javaLab.web.models.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponseDTO implements Serializable {
+public class UserResponseSchema implements Serializable {
 
     private Long id;
 
@@ -21,5 +22,5 @@ public class UserResponseDTO implements Serializable {
 
     private String avatar;
 
-    private String role;
+    private Role role;
 }

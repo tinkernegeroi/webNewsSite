@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserModel {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class UserModel {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String password;
 
     @Column(unique = true, nullable = false)
@@ -32,7 +32,10 @@ public class UserModel {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role Role;
+    private Role role;
+
+    @Column(nullable = false)
+    private int visitsCount;
 
 }
 

@@ -1,7 +1,7 @@
 package com.javaLab.web.controllers;
 
-import com.javaLab.web.dto.UserCreateDTO;
-import com.javaLab.web.models.UserModel;
+import com.javaLab.web.schemas.UserCreateSchema;
+import com.javaLab.web.schemas.UserLoginSchema;
 import com.javaLab.web.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -27,8 +27,17 @@ public class UserController {
             @RequestParam MultipartFile avatar
     )
     {
-        UserCreateDTO userCreateDTO = new UserCreateDTO(username, password, email, avatar);
-        return userService.registerUser(userCreateDTO);
+        UserCreateSchema userCreateSchema = new UserCreateSchema(username, password, email, avatar);
+        return userService.registerUser(userCreateSchema);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(
+            @RequestParam String username,
+            @RequestParam String password
+    ){
+        UserLoginSchema userLoginSchema = new UserLoginSchema(username, password);
+        return userService.loginUser(userLoginSchema);
     }
 
 }

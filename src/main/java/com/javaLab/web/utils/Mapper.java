@@ -1,9 +1,9 @@
-package com.javaLab.web;
+package com.javaLab.web.utils;
 
-import com.javaLab.web.schemas.UserCreateSchema;
-import com.javaLab.web.schemas.UserResponseSchema;
+import com.javaLab.web.dto.UserCreateDTO;
+import com.javaLab.web.dto.UserResponseDTO;
 import com.javaLab.web.models.Role;
-import com.javaLab.web.models.UserModel;
+import com.javaLab.web.models.User;
 import com.javaLab.web.exceptions.FileUploadException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,15 +18,15 @@ public class Mapper {
 
     private final static String IMAGE_URL = "http://localhost:8080/images/";
 
-    private final static String DEFAULT_IMAGE_URL = "http://localhost:8080/images/DEFAULT.png";
+    public final static String DEFAULT_IMAGE_URL = "http://localhost:8080/images/DEFAULT.png";
 
-    public static UserModel userCreateSchemaToUser(UserCreateSchema userCreateSchema){
-        UserModel user = new UserModel();
-        user.setUsername(userCreateSchema.getUsername());
-        user.setPassword(userCreateSchema.getPassword());
-        user.setEmail(userCreateSchema.getEmail());
+    public static User userCreateSchemaToDTO(UserCreateDTO userCreateDTO){
+        User user = new User();
+        user.setUsername(userCreateDTO.getUsername());
+        user.setPassword(userCreateDTO.getPassword());
+        user.setEmail(userCreateDTO.getEmail());
         user.setRole(DEFAULT_ROLE);
-        user.setAvatar(processAvatar(userCreateSchema.getAvatar(), userCreateSchema.getUsername()));
+        user.setAvatar(processAvatar(userCreateDTO.getAvatar(), userCreateDTO.getUsername()));
         return user;
     }
 
@@ -45,8 +45,8 @@ public class Mapper {
         }
     }
 
-    public static UserResponseSchema userToUserResponseSchema(UserModel user){
-        return new UserResponseSchema(
+    public static UserResponseDTO userToUserResponseDTO(User user){
+        return new UserResponseDTO(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),

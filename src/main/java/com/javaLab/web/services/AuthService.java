@@ -20,13 +20,15 @@ public class AuthService {
 
     private final UserRepository userRepository;
 
+    private final Mapper mapper;
+
     public ResponseEntity<?> register(UserCreateDTO dto) {
 
         Optional<String> error = checkIfUserExists(dto);
         if (error.isPresent()) return ResponseEntity.badRequest().body(error.get());
 
-        User savedUser = userRepository.save(Mapper.userCreateSchemaToDTO(dto));
-        return ResponseEntity.ok(Mapper.userToUserResponseDTO(savedUser));
+        User savedUser = userRepository.save(mapper.userCreateSchemaToDTO(dto));
+        return ResponseEntity.ok(mapper.userToUserResponseDTO(savedUser));
     }
 
     public ResponseEntity<?> login(UserLoginDTO userLoginDTO, HttpSession session) {
@@ -41,7 +43,7 @@ public class AuthService {
         if (!user.getPassword().equals(userLoginDTO.getPassword())) {
             return new ResponseEntity<>("Неправильный пароль", HttpStatus.UNAUTHORIZED);
         }
-        UserResponseDTO userResponseDTO = Mapper.userToUserResponseDTO(user);
+        UserResponseDTO userResponseDTO = mapper.userToUserResponseDTO(user);
         session.setAttribute("user", userResponseDTO.getUsername());
         System.out.println(session.getAttribute("user"));
         return ResponseEntity.ok(userResponseDTO);

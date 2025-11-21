@@ -25,6 +25,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final Mapper mapper;
+
     private static final String SESSION_USERNAME = "user";
 
     private static final DateTimeFormatter FORMATTER =
@@ -44,7 +46,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         user.setVisitsCount(user.getVisitsCount() + 1);
         userRepository.save(user);
-        return ResponseEntity.ok(Mapper.userToUserResponseDTO(user));
+        return ResponseEntity.ok(mapper.userToUserResponseDTO(user));
     }
 
     public ServerTimeDTO getServerTime(){
@@ -61,7 +63,7 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        String avatarUrl = Mapper.processAvatar(file, username);
+        String avatarUrl = mapper.processAvatar(file, username);
         user.setAvatar(avatarUrl);
         userRepository.save(user);
 
@@ -73,7 +75,7 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        user.setAvatar(Mapper.DEFAULT_IMAGE_URL);
+        user.setAvatar(mapper.getDefaultImageUrl());
         userRepository.save(user);
 
         return ResponseEntity.ok("Avatar deleted");

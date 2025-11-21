@@ -25,7 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private static final String SESSION_USERNAME = "username";
+    private static final String SESSION_USERNAME = "user";
 
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm:ss");

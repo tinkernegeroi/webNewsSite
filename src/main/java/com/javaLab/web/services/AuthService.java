@@ -42,7 +42,7 @@ public class AuthService {
             return new ResponseEntity<>("Неправильный пароль", HttpStatus.UNAUTHORIZED);
         }
         UserResponseDTO userResponseDTO = Mapper.userToUserResponseDTO(user);
-        session.setAttribute("user", userResponseDTO);
+        session.setAttribute("user", userResponseDTO.getUsername());
         System.out.println(session.getAttribute("user"));
         return ResponseEntity.ok(userResponseDTO);
     }

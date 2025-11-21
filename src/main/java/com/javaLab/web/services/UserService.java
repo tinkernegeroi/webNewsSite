@@ -42,10 +42,18 @@ public class UserService {
 
     public ResponseEntity<UserResponseDTO> getProfile(HttpSession session) {
         String username = getUsernameFromSession(session);
+        if (session.getAttribute("profileVisited") == null) {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+            user.setVisitsCount(user.getVisitsCount() + 1);
+            userRepository.save(user);
+
+            session.setAttribute("profileVisited", true);
+        }
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-        user.setVisitsCount(user.getVisitsCount() + 1);
-        userRepository.save(user);
+
         return ResponseEntity.ok(mapper.userToUserResponseDTO(user));
     }
 

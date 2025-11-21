@@ -3,7 +3,6 @@ package com.javaLab.web.controllers;
 import com.javaLab.web.dto.UserCreateDTO;
 import com.javaLab.web.dto.UserLoginDTO;
 import com.javaLab.web.services.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

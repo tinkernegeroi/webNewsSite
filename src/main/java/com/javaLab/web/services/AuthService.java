@@ -6,7 +6,6 @@ import com.javaLab.web.dto.UserResponseDTO;
 import com.javaLab.web.models.User;
 import com.javaLab.web.repository.UserRepository;
 import com.javaLab.web.utils.Mapper;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,8 +47,7 @@ public class AuthService {
         return ResponseEntity.ok(userResponseDTO);
     }
 
-    public ResponseEntity<?> logout(HttpServletRequest request){
-        HttpSession session = request.getSession(false);
+    public ResponseEntity<?> logout(HttpSession session){
         if (session != null) session.invalidate();
         return ResponseEntity.ok("Logged out");
     }

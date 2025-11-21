@@ -23,4 +23,6 @@ public class UserResponseDTO implements Serializable {
     private String avatar;
 
     private Role role;
+
+    private int visitsCount;
 }

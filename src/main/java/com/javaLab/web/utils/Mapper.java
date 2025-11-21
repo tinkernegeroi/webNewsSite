@@ -51,7 +51,8 @@ public class Mapper {
                 user.getUsername(),
                 user.getEmail(),
                 user.getAvatar(),
-                user.getRole()
+                user.getRole(),
+                user.getVisitsCount()
         );
     }
 }

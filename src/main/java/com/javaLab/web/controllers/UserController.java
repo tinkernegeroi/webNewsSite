@@ -1,5 +1,6 @@
 package com.javaLab.web.controllers;
 
+import com.javaLab.web.dto.ServerTimeDTO;
 import com.javaLab.web.dto.UserResponseDTO;
 import com.javaLab.web.services.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +19,11 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<UserResponseDTO> profile(HttpSession session) {
         return userService.getProfile(session);
+    }
+
+    @GetMapping("/time")
+    public ResponseEntity<ServerTimeDTO> time(){
+        return ResponseEntity.ok(userService.getServerTime());
     }
 
     @PostMapping("/avatar")

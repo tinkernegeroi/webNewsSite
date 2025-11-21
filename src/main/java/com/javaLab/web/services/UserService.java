@@ -31,6 +31,8 @@ public class UserService {
         String username = getUsernameFromSession(session);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.setVisitsCount(user.getVisitsCount() + 1);
+        userRepository.save(user);
         return ResponseEntity.ok(Mapper.userToUserResponseDTO(user));
     }
 

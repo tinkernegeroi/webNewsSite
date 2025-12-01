@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,7 +95,7 @@ public class AdminService {
     public ResponseEntity<String> createUser(AdminCreateUserDTO dto) {
 
         Optional<String> error = checkIfUserExists(dto.getUsername(), dto.getEmail());
-        if(error.isPresent()){
+        if (error.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(error.get());
         }
 
@@ -127,3 +127,4 @@ public class AdminService {
         return Optional.empty();
 
     }
+}

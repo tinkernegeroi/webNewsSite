@@ -9,15 +9,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminEditUserDTO {
-
-    private Long id;
+public class AdminCreateUserDTO {
 
     private String username;
 
+    private String password;
+
     private String email;
 
-    private MultipartFile avatar;
-
     private Role role;
+
+    private MultipartFile avatar;
 }

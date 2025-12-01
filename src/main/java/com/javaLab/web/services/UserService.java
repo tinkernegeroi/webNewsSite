@@ -1,6 +1,7 @@
 package com.javaLab.web.services;
 
 import com.javaLab.web.dto.ServerTimeDTO;
+import com.javaLab.web.dto.UserEditDTO;
 import com.javaLab.web.dto.UserResponseDTO;
 import com.javaLab.web.exceptions.TimeServiceException;
 import com.javaLab.web.exceptions.UnauthorizedException;
@@ -87,5 +88,34 @@ public class UserService {
         userRepository.save(user);
 
         return ResponseEntity.ok("Avatar deleted");
+    }
+
+    public ResponseEntity<String> editUser(HttpSession session, UserEditDTO dto) {
+        String sessionUsername = getUsernameFromSession(session);
+
+        User user = userRepository.findByUsername(sessionUsername)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
+            user.setUsername(dto.getUsername());
+            session.setAttribute("user", dto.getUsername());
+        }
+
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            user.setEmail(dto.getEmail());
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(dto.getPassword());
+        }
+
+        if (dto.getAvatar() != null && !dto.getAvatar().isEmpty()) {
+            String newAvatarUrl = mapper.processAvatar(dto.getAvatar(), user.getUsername());
+            user.setAvatar(newAvatarUrl);
+        }
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User updated");
     }
 }

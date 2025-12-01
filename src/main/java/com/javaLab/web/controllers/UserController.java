@@ -1,6 +1,7 @@
 package com.javaLab.web.controllers;
 
 import com.javaLab.web.dto.ServerTimeDTO;
+import com.javaLab.web.dto.UserEditDTO;
 import com.javaLab.web.dto.UserResponseDTO;
 import com.javaLab.web.services.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +20,14 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<UserResponseDTO> profile(HttpSession session) {
         return userService.getProfile(session);
+    }
+
+    @PatchMapping(value = "/edit", consumes = "multipart/form-data")
+    public ResponseEntity<String> editUser(
+            HttpSession session,
+            @ModelAttribute UserEditDTO dto
+    ) {
+        return userService.editUser(session, dto);
     }
 
     @GetMapping("/time")

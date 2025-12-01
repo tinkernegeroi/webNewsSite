@@ -2,13 +2,11 @@ package com.javaLab.web.controllers;
 
 import com.javaLab.web.dto.AdminCreateUserDTO;
 import com.javaLab.web.dto.AdminEditUserDTO;
-import com.javaLab.web.models.User;
 import com.javaLab.web.services.AdminService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin")

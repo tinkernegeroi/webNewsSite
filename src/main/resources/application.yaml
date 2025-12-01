@@ -16,6 +16,6 @@ spring:
       max-request-size: 30MB
 
 image:
-  path: "C:/Users/Roman/IdeaProjects/web/src/main/resources/static/images"
+  path: "C:\Users\Roman\IdeaProjects\web\uploads\images"
   url: "http://localhost:8080/images/"
-  default: "http://localhost:8080/images/default.png"
+  default: "http://localhost:8080/images/default.jpg"

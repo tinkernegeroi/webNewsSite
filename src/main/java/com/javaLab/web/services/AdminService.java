@@ -133,4 +133,11 @@ public class AdminService {
         List<User> users = userRepository.findAll();
         return ResponseEntity.ok(users);
     }
+
+    public ResponseEntity<User> getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return ResponseEntity.ok(user);
+    }
+
 }

@@ -19,6 +19,11 @@ public class AdminController {
         return adminService.getAllUsers();
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        return adminService.getUserById(id);
+    }
+
     @PostMapping(value = "/create", consumes = "multipart/form-data")
     public ResponseEntity<String> createUser(@ModelAttribute AdminCreateUserDTO dto) {
         return adminService.createUser(dto);

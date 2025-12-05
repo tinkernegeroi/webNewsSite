@@ -71,24 +71,25 @@ public class AdminService {
     }
 
     public void deleteAvatar(User user) {
-        String avatar = user.getAvatar();
+        String avatarUrl = user.getAvatar();
 
-        if (avatar != null && !avatar.equals(mapper.getDefaultImageUrl())) {
+        if (avatarUrl == null || avatarUrl.equals(config.getDefaultImage())) {
+            return;
+        }
 
-            String prefix = "/images/";
-            if (avatar.startsWith(prefix)) {
-                avatar = avatar.substring(prefix.length());
+        try {
+
+            String filename = avatarUrl.substring(avatarUrl.lastIndexOf("/") + 1);
+            Path path = Paths.get(config.getImagePath(), filename);
+
+            if (Files.exists(path)) {
+                Files.delete(path);
+                log.info("Avatar deleted: {}", path);
+            } else {
+                log.warn("Avatar file not found, cannot delete: {}", path);
             }
-
-            Path path = Paths.get(config.getImagePath(), avatar);
-
-            try {
-                if (Files.exists(path)) {
-                    Files.delete(path);
-                }
-            } catch (IOException e) {
-                log.error("Cannot delete avatar: {}", path, e);
-            }
+        } catch (IOException e) {
+            log.error("Failed to delete avatar: {}", avatarUrl, e);
         }
     }
 

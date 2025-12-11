@@ -9,22 +9,15 @@ import com.javaLab.web.repository.UserRepository;
 import com.javaLab.web.utils.Mapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class AdminService {
     private final UserRepository userRepository;
 
@@ -64,34 +57,13 @@ public class AdminService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        deleteAvatar(user);
+        mapper.deleteAvatar(user.getAvatar());
         userRepository.delete(user);
 
         return ResponseEntity.ok("User deleted");
     }
 
-    public void deleteAvatar(User user) {
-        String avatarUrl = user.getAvatar();
 
-        if (avatarUrl == null || avatarUrl.equals(config.getDefaultImage())) {
-            return;
-        }
-
-        try {
-
-            String filename = avatarUrl.substring(avatarUrl.lastIndexOf("/") + 1);
-            Path path = Paths.get(config.getImagePath(), filename);
-
-            if (Files.exists(path)) {
-                Files.delete(path);
-                log.info("Avatar deleted: {}", path);
-            } else {
-                log.warn("Avatar file not found, cannot delete: {}", path);
-            }
-        } catch (IOException e) {
-            log.error("Failed to delete avatar: {}", avatarUrl, e);
-        }
-    }
 
     @Transactional
     public ResponseEntity<String> createUser(AdminCreateUserDTO dto) {

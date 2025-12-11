@@ -10,14 +10,19 @@ import com.javaLab.web.models.Role;
 import com.javaLab.web.models.User;
 import com.javaLab.web.exceptions.FileUploadException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class Mapper {
 
     private final ImageConfig config;
@@ -47,6 +52,28 @@ public class Mapper {
             }
         }
         return config.getDefaultImage();
+    }
+
+    public void deleteAvatar(String imageUrl) {
+
+        if (imageUrl == null || imageUrl.equals(config.getDefaultImage())) {
+            return;
+        }
+
+        try {
+
+            String filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+            Path path = Paths.get(config.getImagePath(), filename);
+
+            if (Files.exists(path)) {
+                Files.delete(path);
+                log.info("Image deleted: {}", path);
+            } else {
+                log.warn("Image file not found, cannot delete: {}", path);
+            }
+        } catch (IOException e) {
+            log.error("Failed to delete Image: {}", imageUrl, e);
+        }
     }
 
     public UserResponseDTO userToUserResponseDTO(User user){

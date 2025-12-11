@@ -2,6 +2,8 @@ package com.javaLab.web.services;
 
 
 import com.javaLab.web.dto.NewsCreateDTO;
+import com.javaLab.web.exceptions.NewsNotFoundException;
+import com.javaLab.web.exceptions.UserNotFoundException;
 import com.javaLab.web.models.News;
 import com.javaLab.web.repository.NewsRepository;
 import com.javaLab.web.utils.Mapper;
@@ -28,6 +30,11 @@ public class ModeratorService {
 
     public ResponseEntity<?> getAllNews() {
         List<News> news = newsRepository.findAll();
+        return ResponseEntity.ok(news);
+    }
+
+    public ResponseEntity<?> getNewsById(Long id){
+        News news = newsRepository.findById(id).orElseThrow(() -> new NewsNotFoundException("News not found"));
         return ResponseEntity.ok(news);
     }
 }

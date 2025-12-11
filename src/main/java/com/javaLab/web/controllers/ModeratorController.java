@@ -24,4 +24,8 @@ public class ModeratorController {
         return moderatorService.getAllNews();
     }
 
+    @GetMapping("/news/{id}")
+    public ResponseEntity<?> getNewsById(@PathVariable Long id) {
+        return moderatorService.getNewsById(id);
+    }
 }

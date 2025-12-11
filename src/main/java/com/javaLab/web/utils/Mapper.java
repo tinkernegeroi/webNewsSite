@@ -1,8 +1,11 @@
 package com.javaLab.web.utils;
 
 import com.javaLab.web.configs.ImageConfig;
+import com.javaLab.web.dto.NewsCreateDTO;
+import com.javaLab.web.dto.NewsResponseDTO;
 import com.javaLab.web.dto.UserCreateDTO;
 import com.javaLab.web.dto.UserResponseDTO;
+import com.javaLab.web.models.News;
 import com.javaLab.web.models.Role;
 import com.javaLab.web.models.User;
 import com.javaLab.web.exceptions.FileUploadException;
@@ -54,6 +57,23 @@ public class Mapper {
                 user.getAvatar(),
                 user.getRole(),
                 user.getVisitsCount()
+        );
+    }
+
+    public News newsCreateDTOToNews(NewsCreateDTO dto, String newsTitle) {
+        News news = new News();
+        news.setTitle(dto.getTitle());
+        news.setDescription(dto.getDescription());
+        news.setImageSrc(processAvatar(dto.getImage(), newsTitle));
+        return news;
+    }
+
+    public NewsResponseDTO newsToNewsResponseDTO(News news){
+        return new NewsResponseDTO(
+                news.getId(),
+                news.getTitle(),
+                news.getDescription(),
+                news.getImageSrc()
         );
     }
 

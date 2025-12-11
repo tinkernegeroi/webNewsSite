@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class ModeratorService {
@@ -22,5 +24,10 @@ public class ModeratorService {
         News news = mapper.newsCreateDTOToNews(newsCreateDTO, title);
         news = newsRepository.save(news);
         return ResponseEntity.ok(mapper.newsToNewsResponseDTO(news));
+    }
+
+    public ResponseEntity<?> getAllNews() {
+        List<News> news = newsRepository.findAll();
+        return ResponseEntity.ok(news);
     }
 }

@@ -6,10 +6,7 @@ import com.javaLab.web.services.ModeratorService;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/moderator")
@@ -22,5 +19,9 @@ public class ModeratorController {
         return moderatorService.createNews(dto);
     }
 
+    @GetMapping("/news")
+    public ResponseEntity<?> getNews(HttpSession session) {
+        return moderatorService.getAllNews();
+    }
 
 }

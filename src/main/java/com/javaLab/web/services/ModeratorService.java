@@ -46,6 +46,9 @@ public class ModeratorService {
             news.setDescription(newsCreateDTO.getDescription());
 
         if (newsCreateDTO.getImage() != null && !newsCreateDTO.getImage().isEmpty()){
+            if (!newsCreateDTO.getImage().isEmpty()){
+                mapper.deleteAvatar(news.getImageSrc());
+            }
             String imageSrc = mapper.processAvatar(newsCreateDTO.getImage(), newsCreateDTO.getTitle());
             news.setImageSrc(imageSrc);
         }

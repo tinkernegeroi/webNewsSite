@@ -110,6 +110,9 @@ public class UserService {
         }
 
         if (dto.getAvatar() != null && !dto.getAvatar().isEmpty()) {
+            if (!user.getAvatar().isBlank()) {
+                mapper.deleteAvatar(user.getAvatar());
+            }
             String newAvatarUrl = mapper.processAvatar(dto.getAvatar(), user.getUsername());
             user.setAvatar(newAvatarUrl);
         }

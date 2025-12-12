@@ -39,6 +39,9 @@ public class AdminService {
         }
 
         if (dto.getAvatar() != null && !dto.getAvatar().isEmpty()) {
+            if (!user.getAvatar().isEmpty()) {
+                mapper.deleteAvatar(user.getAvatar());
+            }
             String avatarUrl = mapper.processAvatar(dto.getAvatar(), user.getUsername());
             user.setAvatar(avatarUrl);
         }

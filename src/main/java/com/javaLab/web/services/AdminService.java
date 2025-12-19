@@ -36,7 +36,11 @@ public class AdminService {
         }
 
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
-            user.setEmail(dto.getEmail());
+            if (mapper.isValidEmail(dto.getEmail())) {
+                user.setEmail(dto.getEmail());
+            }
+            else return ResponseEntity.badRequest().body("Неправильный формат почты");
+
         }
 
         if (dto.getAvatar() != null && !dto.getAvatar().isEmpty()) {
@@ -79,9 +83,13 @@ public class AdminService {
 
         User user = new User();
         user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole(dto.getRole() != null ? dto.getRole() : com.javaLab.web.models.Role.VISITOR);
+        if (mapper.isValidEmail(dto.getEmail())){
+            user.setEmail(dto.getEmail());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            user.setRole(dto.getRole() != null ? dto.getRole() : com.javaLab.web.models.Role.VISITOR);
+        }
+        else return ResponseEntity.badRequest().body("Неправильный формат почты");
+
 
         if (dto.getAvatar() != null && !dto.getAvatar().isEmpty()) {
             String avatarUrl = mapper.processAvatar(dto.getAvatar(), dto.getUsername());

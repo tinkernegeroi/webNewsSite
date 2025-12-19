@@ -90,7 +90,11 @@ public class UserService {
         }
 
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
-            user.setEmail(dto.getEmail());
+            if (mapper.isValidEmail(dto.getEmail())) {
+                user.setEmail(dto.getEmail());
+            }
+            else return ResponseEntity.badRequest().body("Неправильный формат почты");
+
         }
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {

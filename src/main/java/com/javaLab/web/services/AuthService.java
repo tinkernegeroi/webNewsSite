@@ -35,11 +35,14 @@ public class AuthService {
     public ResponseEntity<?> register(UserCreateDTO dto) {
         Optional<String> error = checkIfUserExists(dto);
         if (error.isPresent()) return ResponseEntity.badRequest().body(error.get());
+        if (mapper.isValidEmail(dto.getEmail())) {
+            User user = mapper.userCreateSchemaToDTO(dto);
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            User savedUser = userRepository.save(user);
+            return ResponseEntity.ok(mapper.userToUserResponseDTO(savedUser));
+        }
+        else return ResponseEntity.badRequest().body(error.get());
 
-        User user = mapper.userCreateSchemaToDTO(dto);
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.ok(mapper.userToUserResponseDTO(savedUser));
     }
 
     public ResponseEntity<?> login(UserLoginDTO userLoginDTO, HttpSession session) {

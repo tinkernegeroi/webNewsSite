@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 
 @Component
 @AllArgsConstructor
@@ -26,7 +27,13 @@ import java.nio.file.Paths;
 public class Mapper {
 
     private final ImageConfig config;
+
     private static final Role DEFAULT_ROLE = Role.VISITOR;
+
+    private static final String EMAIL_REGEX =
+            "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
     public User userCreateSchemaToDTO(UserCreateDTO dto) {
         User user = new User();
@@ -105,6 +112,13 @@ public class Mapper {
 
     public String getDefaultImageUrl(){
         return config.getImageUrl();
+    }
+
+    public boolean isValidEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+        return EMAIL_PATTERN.matcher(email).matches();
     }
 }
 

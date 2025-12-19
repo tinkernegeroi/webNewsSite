@@ -9,56 +9,52 @@ import com.javaLab.web.exceptions.UserNotFoundException;
 import com.javaLab.web.models.User;
 import com.javaLab.web.repository.UserRepository;
 import com.javaLab.web.utils.Mapper;
-
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
 @Service
 @AllArgsConstructor
 public class UserService {
+    private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
 
     private final Mapper mapper;
 
-    private static final String SESSION_USERNAME = "user";
-
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm:ss");
 
-    private String getUsernameFromSession(HttpSession session) {
-        String username = (String) session.getAttribute(SESSION_USERNAME);
-        if (username == null) {
+    private String getCurrentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()
+                || "anonymousUser".equals(auth.getPrincipal())) {
             throw new UnauthorizedException("User not logged in");
         }
-        return username;
+        return auth.getName();
+    }
+
+    private User getCurrentUser() {
+        String username = getCurrentUsername();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public ResponseEntity<UserResponseDTO> getProfile(HttpSession session) {
-        String username = getUsernameFromSession(session);
-        if (session.getAttribute("profileVisited") == null) {
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UserNotFoundException("User not found"));
-            user.setVisitsCount(user.getVisitsCount() + 1);
-            userRepository.save(user);
-
-            session.setAttribute("profileVisited", true);
-        }
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = getCurrentUser();
 
         return ResponseEntity.ok(mapper.userToUserResponseDTO(user));
     }
 
-    public ServerTimeDTO getServerTime(){
+    public ServerTimeDTO getServerTime() {
         try {
             String time = FORMATTER.format(LocalDateTime.now());
             return new ServerTimeDTO(time);
@@ -68,11 +64,9 @@ public class UserService {
     }
 
     public ResponseEntity<String> uploadAvatar(HttpSession session, MultipartFile file) {
-        String username = getUsernameFromSession(session);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = getCurrentUser();
 
-        String avatarUrl = mapper.processAvatar(file, username);
+        String avatarUrl = mapper.processAvatar(file, user.getUsername());
         user.setAvatar(avatarUrl);
         userRepository.save(user);
 
@@ -80,9 +74,7 @@ public class UserService {
     }
 
     public ResponseEntity<String> deleteAvatar(HttpSession session) {
-        String username = getUsernameFromSession(session);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = getCurrentUser();
 
         user.setAvatar(mapper.getDefaultImageUrl());
         userRepository.save(user);
@@ -91,14 +83,10 @@ public class UserService {
     }
 
     public ResponseEntity<String> editUser(HttpSession session, UserEditDTO dto) {
-        String sessionUsername = getUsernameFromSession(session);
-
-        User user = userRepository.findByUsername(sessionUsername)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = getCurrentUser();
 
         if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
             user.setUsername(dto.getUsername());
-            session.setAttribute("user", dto.getUsername());
         }
 
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
@@ -106,11 +94,12 @@ public class UserService {
         }
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            user.setPassword(dto.getPassword());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
         if (dto.getAvatar() != null && !dto.getAvatar().isEmpty()) {
-            if (!user.getAvatar().isBlank()) {
+            if (user.getAvatar() != null && !user.getAvatar().isBlank()
+                    && !user.getAvatar().equals(mapper.getDefaultImageUrl())) {
                 mapper.deleteAvatar(user.getAvatar());
             }
             String newAvatarUrl = mapper.processAvatar(dto.getAvatar(), user.getUsername());

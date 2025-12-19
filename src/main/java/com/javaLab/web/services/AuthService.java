@@ -3,6 +3,7 @@ package com.javaLab.web.services;
 import com.javaLab.web.dto.UserCreateDTO;
 import com.javaLab.web.dto.UserLoginDTO;
 import com.javaLab.web.dto.UserResponseDTO;
+import com.javaLab.web.exceptions.UserNotFoundException;
 import com.javaLab.web.models.User;
 import com.javaLab.web.repository.UserRepository;
 import com.javaLab.web.utils.Mapper;
@@ -10,6 +11,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,34 +28,44 @@ public class AuthService {
 
     private final Mapper mapper;
 
-    public ResponseEntity<?> register(UserCreateDTO dto) {
+    private final PasswordEncoder passwordEncoder;
 
+    private final AuthenticationManager authenticationManager;
+
+    public ResponseEntity<?> register(UserCreateDTO dto) {
         Optional<String> error = checkIfUserExists(dto);
         if (error.isPresent()) return ResponseEntity.badRequest().body(error.get());
 
-        User savedUser = userRepository.save(mapper.userCreateSchemaToDTO(dto));
+        User user = mapper.userCreateSchemaToDTO(dto);
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        User savedUser = userRepository.save(user);
         return ResponseEntity.ok(mapper.userToUserResponseDTO(savedUser));
     }
 
     public ResponseEntity<?> login(UserLoginDTO userLoginDTO, HttpSession session) {
-        Optional<User> userOptional = userRepository.findByUsername(userLoginDTO.getUsername());
-        if(userOptional.isEmpty()){
-            return new ResponseEntity<>
-                    ("Пользователь с таким логином не зарегистрирован", HttpStatus.NOT_FOUND);
-        }
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            userLoginDTO.getUsername(),
+                            userLoginDTO.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
-        User user = userOptional.get();
+            User user = userRepository.findByUsername(userLoginDTO.getUsername())
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!user.getPassword().equals(userLoginDTO.getPassword())) {
-            return new ResponseEntity<>("Неправильный пароль", HttpStatus.UNAUTHORIZED);
+
+
+            return ResponseEntity.ok(mapper.userToUserResponseDTO(user));
+        } catch (Exception e) {
+            return new ResponseEntity<>("Неверные данные", HttpStatus.UNAUTHORIZED);
         }
-        UserResponseDTO userResponseDTO = mapper.userToUserResponseDTO(user);
-        session.setAttribute("user", userResponseDTO.getUsername());
-        System.out.println(session.getAttribute("user"));
-        return ResponseEntity.ok(userResponseDTO);
     }
 
-    public ResponseEntity<?> logout(HttpSession session){
+    public ResponseEntity<?> logout(HttpSession session) {
+        SecurityContextHolder.clearContext();
         if (session != null) session.invalidate();
         return ResponseEntity.ok("Logged out");
     }

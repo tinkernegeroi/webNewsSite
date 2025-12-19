@@ -31,7 +31,6 @@ public class Mapper {
     public User userCreateSchemaToDTO(UserCreateDTO dto) {
         User user = new User();
         user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
         user.setEmail(dto.getEmail());
         user.setRole(DEFAULT_ROLE);
         user.setAvatar(processAvatar(dto.getAvatar(), dto.getUsername()));

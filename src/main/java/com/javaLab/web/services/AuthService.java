@@ -2,7 +2,6 @@ package com.javaLab.web.services;
 
 import com.javaLab.web.dto.UserCreateDTO;
 import com.javaLab.web.dto.UserLoginDTO;
-import com.javaLab.web.dto.UserResponseDTO;
 import com.javaLab.web.exceptions.UserNotFoundException;
 import com.javaLab.web.models.User;
 import com.javaLab.web.repository.UserRepository;

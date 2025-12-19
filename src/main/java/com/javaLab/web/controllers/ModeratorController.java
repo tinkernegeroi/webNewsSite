@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 /**
  * REST-контроллер для управления новостями.
  * Доступ: MODERATOR и ADMIN (кроме getallnews - публичный).

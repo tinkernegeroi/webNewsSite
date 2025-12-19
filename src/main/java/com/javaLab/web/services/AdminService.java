@@ -1,6 +1,5 @@
 package com.javaLab.web.services;
 
-import com.javaLab.web.configs.ImageConfig;
 import com.javaLab.web.dto.AdminCreateUserDTO;
 import com.javaLab.web.dto.AdminEditUserDTO;
 import com.javaLab.web.exceptions.UserNotFoundException;

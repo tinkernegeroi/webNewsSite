@@ -17,6 +17,18 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/**
+ * Конфигурация безопасности Spring Security для веб-приложения.
+ * <p>
+ * Настраивает:
+ * <ul>
+ *   <li>Авторизацию по ролям (ADMIN, MODERATOR)</li>
+ *   <li>Открытый доступ к /auth/**, /images/**, /news/getallnews</li>
+ *   <li>CORS для localhost:5173 (фронтенд)</li>
+ *   <li>BCrypt шифрование паролей</li>
+ * </ul>
+ * </p>
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -25,6 +37,14 @@ public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
 
+    /**
+     * Основная цепочка фильтров безопасности.
+     * Отключает CSRF, настраивает авторизацию и CORS.
+     *
+     * @param http объект конфигурации HttpSecurity
+     * @return настроенная цепочка фильтров
+     * @throws Exception при ошибках конфигурации
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -42,16 +62,35 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Шифровщик паролей BCrypt.
+     * Используется для хеширования паролей пользователей.
+     *
+     * @return BCryptPasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Менеджер аутентификации Spring Security.
+     *
+     * @param configuration конфигурация аутентификации
+     * @return AuthenticationManager
+     * @throws Exception при ошибках конфигурации
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    /**
+     * Провайдер аутентификации на основе UserDetailsService.
+     * Связывает сервис пользователей с шифровщиком паролей.
+     *
+     * @return настроенный DaoAuthenticationProvider
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -60,6 +99,12 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Конфигурация CORS для фронтенда на localhost:5173.
+     * Разрешает все методы и заголовки с поддержкой credentials.
+     *
+     * @return CorsConfigurationSource
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

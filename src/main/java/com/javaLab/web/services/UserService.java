@@ -21,18 +21,25 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Сервис для операций с профилем авторизованного пользователя.
+ */
 @Service
 @AllArgsConstructor
 public class UserService {
     private final PasswordEncoder passwordEncoder;
-
     private final UserRepository userRepository;
-
     private final Mapper mapper;
 
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm:ss");
 
+    /**
+     * Получает текущего авторизованного пользователя из SecurityContext.
+     *
+     * @return User текущего пользователя
+     * @throws UnauthorizedException если пользователь не авторизован
+     */
     private String getCurrentUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()
@@ -42,18 +49,35 @@ public class UserService {
         return auth.getName();
     }
 
+    /**
+     * Получает объект текущего пользователя из репозитория.
+     *
+     * @return User текущего пользователя
+     * @throws UserNotFoundException если пользователь не найден
+     */
     private User getCurrentUser() {
         String username = getCurrentUsername();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
+    /**
+     * Возвращает профиль текущего пользователя.
+     *
+     * @param session HTTP сессия (не используется напрямую)
+     * @return ResponseEntity с UserResponseDTO
+     */
     public ResponseEntity<UserResponseDTO> getProfile(HttpSession session) {
         User user = getCurrentUser();
-
         return ResponseEntity.ok(mapper.userToUserResponseDTO(user));
     }
 
+    /**
+     * Возвращает текущее серверное время в формате dd.MM.uuuu HH:mm:ss.
+     *
+     * @return ServerTimeDTO с временем
+     * @throws TimeServiceException при ошибках форматирования
+     */
     public ServerTimeDTO getServerTime() {
         try {
             String time = FORMATTER.format(LocalDateTime.now());
@@ -63,25 +87,42 @@ public class UserService {
         }
     }
 
+    /**
+     * Загружает новый аватар для текущего пользователя.
+     *
+     * @param session HTTP сессия (не используется напрямую)
+     * @param file файл аватара
+     * @return ResponseEntity с подтверждением
+     */
     public ResponseEntity<String> uploadAvatar(HttpSession session, MultipartFile file) {
         User user = getCurrentUser();
-
         String avatarUrl = mapper.processAvatar(file, user.getUsername());
         user.setAvatar(avatarUrl);
         userRepository.save(user);
-
         return ResponseEntity.ok("Avatar uploaded");
     }
 
+    /**
+     * Удаляет аватар пользователя (устанавливает аватар по умолчанию).
+     *
+     * @param session HTTP сессия (не используется напрямую)
+     * @return ResponseEntity с подтверждением
+     */
     public ResponseEntity<String> deleteAvatar(HttpSession session) {
         User user = getCurrentUser();
-
         user.setAvatar(mapper.getDefaultImageUrl());
         userRepository.save(user);
-
         return ResponseEntity.ok("Avatar deleted");
     }
 
+    /**
+     * Обновляет профиль текущего пользователя.
+     * Обновляет только переданные поля.
+     *
+     * @param session HTTP сессия (не используется напрямую)
+     * @param dto данные для обновления
+     * @return ResponseEntity с результатом
+     */
     public ResponseEntity<String> editUser(HttpSession session, UserEditDTO dto) {
         User user = getCurrentUser();
 
@@ -92,9 +133,9 @@ public class UserService {
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             if (mapper.isValidEmail(dto.getEmail())) {
                 user.setEmail(dto.getEmail());
+            } else {
+                return ResponseEntity.badRequest().body("Неправильный формат почты");
             }
-            else return ResponseEntity.badRequest().body("Неправильный формат почты");
-
         }
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
@@ -111,7 +152,6 @@ public class UserService {
         }
 
         userRepository.save(user);
-
         return ResponseEntity.ok("User updated");
     }
 }

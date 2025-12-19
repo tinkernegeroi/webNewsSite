@@ -11,12 +11,23 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Реализация UserDetailsService для Spring Security.
+ * Загружает пользователя по username и преобразует роль в GrantedAuthority.
+ */
 @Service
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Загружает пользователя по username для аутентификации.
+     *
+     * @param username имя пользователя
+     * @return UserDetails с ролями
+     * @throws UsernameNotFoundException если пользователь не найден
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)

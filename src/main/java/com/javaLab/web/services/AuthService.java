@@ -20,31 +20,47 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Сервис аутентификации и регистрации пользователей.
+ */
 @Service
 @AllArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-
     private final Mapper mapper;
-
     private final PasswordEncoder passwordEncoder;
-
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Регистрирует нового пользователя (роль VISITOR по умолчанию).
+     *
+     * @param dto данные для регистрации
+     * @return ResponseEntity с UserResponseDTO или ошибкой
+     */
     public ResponseEntity<?> register(UserCreateDTO dto) {
         Optional<String> error = checkIfUserExists(dto);
-        if (error.isPresent()) return ResponseEntity.badRequest().body(error.get());
+        if (error.isPresent()) {
+            return ResponseEntity.badRequest().body(error.get());
+        }
         if (mapper.isValidEmail(dto.getEmail())) {
             User user = mapper.userCreateSchemaToDTO(dto);
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
             User savedUser = userRepository.save(user);
             return ResponseEntity.ok(mapper.userToUserResponseDTO(savedUser));
+        } else {
+            return ResponseEntity.badRequest().body("Неправильный формат почты");
         }
-        else return ResponseEntity.badRequest().body(error.get());
-
     }
 
+    /**
+     * Аутентифицирует пользователя и создает сессию.
+     * Увеличивает счетчик посещений.
+     *
+     * @param userLoginDTO данные для входа
+     * @param session HTTP сессия
+     * @return ResponseEntity с UserResponseDTO или ошибкой
+     */
     public ResponseEntity<?> login(UserLoginDTO userLoginDTO, HttpSession session) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -61,24 +77,39 @@ public class AuthService {
 
             user.setVisitsCount(user.getVisitsCount() + 1);
             userRepository.save(user);
-
             return ResponseEntity.ok(mapper.userToUserResponseDTO(user));
         } catch (Exception e) {
             return new ResponseEntity<>("Неверные данные", HttpStatus.UNAUTHORIZED);
         }
     }
 
+    /**
+     * Завершает сессию пользователя.
+     *
+     * @param session HTTP сессия
+     * @return ResponseEntity с подтверждением выхода
+     */
     public ResponseEntity<?> logout(HttpSession session) {
         SecurityContextHolder.clearContext();
-        if (session != null) session.invalidate();
+        if (session != null) {
+            session.invalidate();
+        }
         return ResponseEntity.ok("Logged out");
     }
 
+    /**
+     * Проверяет уникальность username и email при регистрации.
+     *
+     * @param userCreateDTO данные пользователя
+     * @return Optional с ошибкой или пустой
+     */
     private Optional<String> checkIfUserExists(UserCreateDTO userCreateDTO) {
-        if (userRepository.findByUsername(userCreateDTO.getUsername()).isPresent())
+        if (userRepository.findByUsername(userCreateDTO.getUsername()).isPresent()) {
             return Optional.of("Пользователь с таким логином уже зарегистрирован");
-        if (userRepository.findByEmail(userCreateDTO.getEmail()).isPresent())
+        }
+        if (userRepository.findByEmail(userCreateDTO.getEmail()).isPresent()) {
             return Optional.of("Пользователь с такой почтой уже зарегистрирован");
+        }
         return Optional.empty();
     }
 }

@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class AdminService {
 
     private final Mapper mapper;
 
-    private final ImageConfig config;
+    private final PasswordEncoder passwordEncoder;
 
     public ResponseEntity<String> updateUser(Long id, AdminEditUserDTO dto) {
 
@@ -79,7 +80,7 @@ public class AdminService {
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(dto.getRole() != null ? dto.getRole() : com.javaLab.web.models.Role.VISITOR);
 
         if (dto.getAvatar() != null && !dto.getAvatar().isEmpty()) {

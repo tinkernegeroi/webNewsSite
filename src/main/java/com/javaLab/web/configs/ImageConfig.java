@@ -1,11 +1,11 @@
 package com.javaLab.web.configs;
 
-import lombok.Getter;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Getter
+@Data
 public class ImageConfig {
 
     @Value("${image.path}")

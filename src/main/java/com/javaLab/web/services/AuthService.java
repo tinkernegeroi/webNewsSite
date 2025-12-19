@@ -56,7 +56,8 @@ public class AuthService {
             User user = userRepository.findByUsername(userLoginDTO.getUsername())
                     .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-
+            user.setVisitsCount(user.getVisitsCount() + 1);
+            userRepository.save(user);
 
             return ResponseEntity.ok(mapper.userToUserResponseDTO(user));
         } catch (Exception e) {

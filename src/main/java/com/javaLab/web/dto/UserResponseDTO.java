@@ -1,15 +1,12 @@
 package com.javaLab.web.dto;
 
 import com.javaLab.web.models.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseDTO implements Serializable {
